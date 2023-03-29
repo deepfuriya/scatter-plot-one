@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>LAB 6</title>
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+	
+</body>
+<script>
+	var svgVar = "http://www.w3.org/2000/svg";
+
+	d3.json("iris.json").then(function(data){
+		var tempArray = [];
+		for (var i = 0; i <= data.length - 1; i++) {
+			tempArray.push({"sepal" : data[i].sepalLength,"petal" : data[i].petalLength});
+		}
+		console.log(tempArray);
+		plot(tempArray);
+	});
+
+	function plot(data) {
+
+		var width = 600, height = 500, spacing = 120;
+
+		var svg = d3.select('body').append('svg').attr('width',width).attr('height',height).style("background","lightBlue").append("g").attr('transform',"translate("+spacing / 2 +","+ spacing / 2 +")");
+
+		var xScale = d3.scaleLinear().domain([d3.min(data,function(d){return d.sepal;}), d3.max(data,function(d){return d.sepal; })]).range([0 , width - spacing]);
+
+		var yScale = d3.scaleLinear().domain([1, d3.max(data,function(d){return d.petal})]).range([height-spacing,0]);
+
+		var xAxis = d3.axisBottom(xScale);
+		var yAxis = d3.axisLeft(yScale);
+
+		const xAxisG = svg.append("g").attr('transform','translate(0,'+(height-spacing)+')').call(xAxis);
+		const yAxisG = svg.append("g").call(yAxis);
+
+
+		var dots = svg.append("g").selectAll("dot").data(data);
+
+		dots.enter().append("circle").attr("cx",function(d){return xScale(d.sepal);}).attr("cy",function(d){return yScale(d.petal)}).attr("r",2).attr("fill","red");
+
+		const xAxisLabel = xAxisG.data([null]).selectAll('.axis-label').data([null]);
+		xAxisLabel.enter().append('text').attr('class','axis-label').attr('fill','black').attr('font-size','medium').merge(xAxisLabel).text('Sepal Length').attr('x',innerWidth / 2).attr('y',45);
+
+		const yAxisLabel = yAxisG.data([null]).selectAll('.yaxis-label').data([null]);
+		yAxisLabel.enter().append('text').attr('class','yaxis-label').attr('fill','black').attr('font-size','medium').merge(yAxisLabel).text('Petal Length').attr('transform','rotate(-90)').attr('x',-10).attr('y',-35);;
+
+
+
+	}
+</script>
+</html>
